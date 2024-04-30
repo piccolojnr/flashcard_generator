@@ -3,6 +3,15 @@ import os
 import json
 from tqdm import tqdm
 
+ZUKI_API_KEY = os.getenv("ZUKI_API_KEY")
+NAGA_API_KEY = os.getenv("NAGA_API_KEY")
+HYZENBERG_API_KEY = os.getenv("HYZENBERG_API_KEY")
+KRAKEN_API_KEY = os.getenv("KRAKEN_API_KEY")
+WEBRAFT_API_KEY = os.getenv("WEBRAFT_API_KEY")
+SHUTTLE_API_KEY = os.getenv("SHUTTLE_API_KEY")
+OXYGEN_API_KEY = os.getenv("OXYGEN_API_KEY")
+MANDRILL_API_KEY = os.getenv("MANDRILL_API_KEY")
+
 
 def extract_list(response):
     if isinstance(response, list):
@@ -30,7 +39,7 @@ def extract_list(response):
 
 def configure_zuki():
     return OpenAI(
-        api_key="zu-bc893a5900d3a5bd70f5ff1a0cc0bbbb",
+        api_key=NAGA_API_KEY,
         base_url="https://zukijourney.xyzbot.net/v1",
     )
 
@@ -44,42 +53,42 @@ def configure_naga():
 def configure_hyzenberg():
     return OpenAI(
         base_url="https://api.hyzen.cc/v1",
-        api_key="hyzen-19c17d8e1295db3fa4056806e319d69bc0a5",
+        api_key=HYZENBERG_API_KEY,
     )
 
 
 def configure_kraken():
     return OpenAI(
         base_url="https://api.cracked.systems/v1",
-        api_key="vsjPCNkP4UaYFk1e",
+        api_key=KRAKEN_API_KEY,
     )
 
 
 def configure_webraft():
     return OpenAI(
         base_url="https://api.webraft.in/freeapi",
-        api_key="wr-ffzbLm0DPSsv2UlGzTqRe7 ",
+        api_key=WEBRAFT_API_KEY,
     )
 
 
 def configure_shuttle():
     return OpenAI(
         base_url="https://api.shuttleai.app/v1",
-        api_key="shuttle-674db29ea41022a74aae",
+        api_key=SHUTTLE_API_KEY,
     )
 
 
 def configure_mandrill():
     return OpenAI(
         base_url="https://api.mandrillai.tech/v1",
-        api_key="md-fDJVaYrkhOInzuQQRcmGasuYqQmekDkKRvRIDZnWgxrWfGuO",
+        api_key=MANDRILL_API_KEY,
     )
 
 
 def configure_oxygen():
     return OpenAI(
         base_url="https://app.oxyapi.uk/v1/",
-        api_key="oxy-Z8KcWDCotUzl3ICkz0YornF4RuMN3bn201hBOyKBtqIlY",
+        api_key=OXYGEN_API_KEY,
     )
 
 
