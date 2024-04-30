@@ -1,0 +1,137 @@
+#!./venv/bin/python3
+import argparse
+from scripts.extract_json import extract_json
+from scripts.extract_text import extract_text_from_args
+from scripts.generate_flashcards import generate_flashcards_from_args
+from scripts.create_flashcards import create_flashcards_from_args
+from scripts.make_flashcards import make_flashcards_from_args
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(dest="command")
+
+    extract_parser = subparsers.add_parser("extract", description="Extract text.")
+    extract_parser.add_argument(
+        "-i",
+        "--input",
+        help="Path to the file or folder [.pptx, .pdf, .txt, .docx].",
+        required=True,
+    )
+    extract_parser.add_argument(
+        "-o", "--output", help="Path to the output file or folder.", required=True
+    )
+    extract_parser.add_argument(
+        "-cl",
+        "--character-limit",
+        help="Character limit for each output file.",
+        type=int,
+    )
+
+    generate_flashcards_parser = subparsers.add_parser(
+        "generate-flashcards",
+        description="Generate flashcards presentation from JSON file(s).",
+    )
+    generate_flashcards_parser.add_argument(
+        "-i",
+        "--input",
+        help="Path to the JSON file or directory containing JSON files.",
+        required=True,
+    )
+    generate_flashcards_parser.add_argument(
+        "-o",
+        "--output",
+        help="Name of the output PowerPoint presentation file (without extension).",
+        required=True,
+    )
+    generate_flashcards_parser.add_argument(
+        "-c",
+        "--config",
+        help="Path to the configuration file.",
+        default="static/conf.json",
+    )
+    generate_flashcards_parser.add_argument(
+        "-t", "--title", help="Title of the output presentation.", required=True
+    )
+
+    extract_json_parser = subparsers.add_parser(
+        "extract-json", description="Extract JSON data from HTML content."
+    )
+    extract_json_parser.add_argument(
+        "-i", "--input", help="Path to the HTML file or folder.", required=True
+    )
+    extract_json_parser.add_argument(
+        "-o",
+        "--output",
+        help="Path to the output file (json) or folder (no extension).",
+        required=True,
+    )
+    extract_json_parser.add_argument(
+        "-m",
+        "--merge",
+        help="Merge all extracted data into a single file.",
+        action="store_true",
+    )
+    extract_json_parser.add_argument(
+        "-l", "--limit", help="List length for the output file", type=int
+    )
+
+    generate_flashcards_from_ai_parser = subparsers.add_parser(
+        "generate-flashcards-from-ai", description="Generate flashcards from AI."
+    )
+    generate_flashcards_from_ai_parser.add_argument(
+        "-i", "--input", help="Path to the text file or folder (txt).", required=True
+    )
+    generate_flashcards_from_ai_parser.add_argument(
+        "-o", "--output", help="Path to the output folder.", required=True
+    )
+
+    make_flashcards = subparsers.add_parser(
+        "make-flashcards", description="Generate flashcards from PowerPoint files."
+    )
+    make_flashcards.add_argument(
+        "-i",
+        "--input",
+        help="Path to the file or directory containing the files. [.pptx, .pdf, .txt, .docx]",
+        required=True,
+    )
+    make_flashcards.add_argument(
+        "-o",
+        "--output",
+        help="Path to the output directory.",
+    )
+    make_flashcards.add_argument(
+        "-n",
+        "--name",
+        help="Name of the output PowerPoint presentation file (without extension).",
+        required=True,
+    )
+    make_flashcards.add_argument(
+        "-t", "--title", help="Title of the output presentation.", required=True
+    )
+    make_flashcards.add_argument(
+        "-p",
+        "--prompt",
+        help="Prompt to use for the AI model. If not specified, the default prompt will be used.",
+    )
+    args = parser.parse_args()
+
+    if not args.command:
+        parser.print_help()
+        exit()
+
+    # Dispatch to the appropriate function based on the subcommand
+    if args.command == "extract":
+        extract_text_from_args(args)
+    elif args.command == "generate-flashcards":
+        create_flashcards_from_args(args)
+    elif args.command == "extract-json":
+        extract_json(args)
+    elif args.command == "generate-flashcards-from-ai":
+        generate_flashcards_from_args(args)
+    elif args.command == "make-flashcards":
+        make_flashcards_from_args(args)
+
+
+if __name__ == "__main__":
+    main()

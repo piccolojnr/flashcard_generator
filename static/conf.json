@@ -1,0 +1,157 @@
+{
+    "bgs": [
+        {
+            "height": 8478640,
+            "img_path": "static/images/bgs/Picture1.png",
+            "left": -3187369,
+            "top": -1292446,
+            "width": 27287266
+        },
+        {
+            "height": 6808383,
+            "img_path": "static/images/bgs/Picture2.png",
+            "left": -1541927,
+            "top": 3198546,
+            "width": 20123317
+        },
+        {
+            "height": 15163651,
+            "img_path": "static/images/bgs/Picture3.png",
+            "left": 2065647,
+            "top": -2297508,
+            "width": 18279942
+        },
+        {
+            "height": 13472380,
+            "img_path": "static/images/bgs/Picture4.png",
+            "left": -352454,
+            "top": 531699,
+            "width": 23816349
+        },
+        {
+            "height": 9205431,
+            "img_path": "static/images/bgs/Picture5.png",
+            "left": -309510,
+            "top": 3992789,
+            "width": 16306195
+        },
+        {
+            "height": 8941584,
+            "img_path": "static/images/bgs/Picture6.png",
+            "left": 2479074,
+            "top": -1448100,
+            "width": 19372415
+        },
+        {
+            "height": 7757086,
+            "img_path": "static/images/bgs/Picture7.png",
+            "left": -45585,
+            "top": 3523,
+            "width": 22358978
+        },
+        {
+            "height": 9882737,
+            "img_path": "static/images/bgs/Picture8.png",
+            "left": -1986019,
+            "top": 672332,
+            "width": 21192310
+        },
+        {
+            "height": 13354719,
+            "img_path": "static/images/bgs/Picture9.png",
+            "left": -1422086,
+            "top": -2708131,
+            "width": 20637126
+        },
+        {
+            "height": 10484781,
+            "img_path": "static/images/bgs/Picture10.png",
+            "left": 201042,
+            "top": 605510,
+            "width": 17498394
+        }
+    ],
+    "flash_card": {
+        "height": 6267881,
+        "img_path": "static/images/flash_card.png",
+        "left": 1340704,
+        "top": 1866900,
+        "width": 15528648
+    },
+    "footer": {
+        "height": 9284717,
+        "img_path": "static/images/footer_bg.png",
+        "left": 1028700,
+        "text_left": 8994298.0,
+        "top": 678950,
+        "width": 15931196
+    },
+    "header": {
+        "height": 18239272,
+        "img_path": "static/images/header_bg.png",
+        "left": 444006,
+        "title": {
+            "alignment": 2,
+            "color": [
+                0,
+                0,
+                0
+            ],
+            "font": "More Sugar",
+            "height": 602729,
+            "left": 4559598,
+            "size": 499110,
+            "top": 1000000,
+            "width": 4784986
+        },
+        "top": 239456,
+        "width": 19759780
+    },
+    "slide_color": [
+        223,
+        223,
+        223
+    ],
+    "slide_height": 10287000,
+    "slide_width": 18288000,
+    "texts": {
+        "at": {
+            "alignment": 2,
+            "color": [
+                0,
+                0,
+                0
+            ],
+            "font": "More Sugar",
+            "height": 5038263,
+            "left": 10237308,
+            "text": "Answer",
+            "top": 2743200,
+            "width": 6373385,
+            "font_file": "static/MoreSugar.otf",
+            "max_size": 36,
+            "word_wrap": true,
+            "vertical_anchor": 3,
+            "auto_size": 2
+        },
+        "qt": {
+            "alignment": 2,
+            "color": [
+                0,
+                0,
+                0
+            ],
+            "font": "More Sugar",
+            "height": 5038263,
+            "left": 1493040,
+            "text": "Question",
+            "top": 2743200,
+            "width": 6373385,
+            "font_file": "static/MoreSugar.otf",
+            "max_size": 44,
+            "word_wrap": true,
+            "vertical_anchor": 3,
+            "auto_size": 2
+        }
+    }
+}
