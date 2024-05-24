@@ -2,6 +2,14 @@ from openai import OpenAI
 import os
 import json
 from tqdm import tqdm
+import dotenv
+
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
+script_dir = os.path.dirname(script_dir)
+
+dotenv.load_dotenv(os.path.join(script_dir + "/.env"))
+
 
 ZUKI_API_KEY = os.getenv("ZUKI_API_KEY")
 NAGA_API_KEY = os.getenv("NAGA_API_KEY")
@@ -11,6 +19,26 @@ WEBRAFT_API_KEY = os.getenv("WEBRAFT_API_KEY")
 SHUTTLE_API_KEY = os.getenv("SHUTTLE_API_KEY")
 OXYGEN_API_KEY = os.getenv("OXYGEN_API_KEY")
 MANDRILL_API_KEY = os.getenv("MANDRILL_API_KEY")
+
+
+def get_prompt(data, prompt=None):
+    prompt = (
+        prompt
+        if prompt
+        else """Instructions:
+1. Review the text carefully.
+2. Identify key concepts, important definitions, and significant facts.
+3. For each key point, generate a question that prompts recall or understanding.
+4. Make sure each question has a clear and concise answer derived from the text.
+5. Include additional relevant information if necessary to provide context or enhance understanding.
+6. Format the flashcards into JSON, with each flashcard containing a question and its corresponding answer.
+7. Ensure that the JSON structure follows the format: [{"question": "Question text", "answer": "Answer text"}, ...]
+8. Aim for clarity and simplicity in both questions and answers."""
+    )
+    return f"""
+{data}
+{prompt}
+"""
 
 
 def extract_list(response):
@@ -112,15 +140,7 @@ def use_ai(client, content):
 
 
 def get_flashcards_data(data, client, prompt=None):
-    prompt = prompt if prompt else "Generate JSON flashcards from the following text:"
-    data = f"{prompt}\n{data}"
-    content = f"""{data}
-Instructions:
-1. Review the text thoroughly.
-2. Pinpoint key points for flashcards.
-3. Generate questions based on these key points.
-4. Include additional relevant information if deemed important.
-5. Format the flashcards into JSON, incorporating questions and answers."""
+    content = get_prompt(data, prompt)
 
     return use_ai(client, content)
 

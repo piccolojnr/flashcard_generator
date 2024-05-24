@@ -4,6 +4,32 @@ from pypdf import PdfReader
 
 import docx2txt
 
+import re
+
+
+# Function to clean up extracted text
+def clean_text(text):
+    # Remove extra spaces and line breaks
+    text = re.sub(r"\s+", " ", text)
+    # Remove special characters
+    text = re.sub(r"[^A-Za-z0-9\s]", "", text)
+    return text.strip()
+
+
+# Function to process extracted text
+
+
+def process_text(extracted_text, character_limit):
+    cleaned_text_chunks = []
+    for text in extracted_text:
+        cleaned_text = clean_text(text)
+        chunks = [
+            cleaned_text[i : i + character_limit]
+            for i in range(0, len(cleaned_text), character_limit)
+        ]
+        cleaned_text_chunks.extend(chunks)
+    return cleaned_text_chunks
+
 
 def extract_text_from_txt(txt_file_path, cl):
     extracted_text = []
@@ -31,10 +57,9 @@ def extract_text_from_pdf(pdf_file, cl):
     reader = PdfReader(pdf_file)
 
     for page in reader.pages:
-        for i in range(0, len(page.extract_text()), cl):
-            extracted_text.append(page.extract_text()[i : i + cl])
+        extracted_text.append(page.extract_text())
 
-    return "\n".join(extracted_text)
+    return extracted_text
 
 
 def extract_text_from_pptx(pptx_file_path, cl):
@@ -42,14 +67,14 @@ def extract_text_from_pptx(pptx_file_path, cl):
     extracted_text = []
 
     for slide in presentation.slides:
+        slide_text = ""
         for shape in slide.shapes:
             if shape.has_text_frame:
-                text = shape.text
-                for i in range(0, len(text), cl):
-                    extracted_text.append(text[i : i + cl])
-                extracted_text.append(text)
+                text = shape.text.strip()
+                slide_text += text + "\n"
+        extracted_text.append(slide_text)
 
-    return "\n".join(extracted_text)
+    return extracted_text
 
 
 def process_pptx_files(input_path, output_path, character_limit):
@@ -95,6 +120,8 @@ def process_pptx_files(input_path, output_path, character_limit):
     else:
         print("Invalid input path.")
         return
+
+    extracted_data = process_text(extracted_data, character_limit)
 
     if os.path.exists(output_path) and os.listdir(output_path):
         raise ValueError("Output path is not empty.")
