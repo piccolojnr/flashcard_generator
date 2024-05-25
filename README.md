@@ -21,6 +21,7 @@ The Flashcard Generator is a unified tool designed to extract text from various 
 - `requests`
 - `python-pptx`
 - `random`
+- [Ollama](https://ollama.com/) installed and configured with a working model pulled
 
 ## Installation
 
