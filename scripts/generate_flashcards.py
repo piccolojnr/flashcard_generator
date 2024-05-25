@@ -1,31 +1,16 @@
-from openai import OpenAI
 import os
 import json
 from tqdm import tqdm
-import dotenv
+import requests
+from scripts import caching
+
+# Define the base directory for API URL and other paths
+API_URL = "http://127.0.0.1:11434/api/generate"
+PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
 
 
-script_dir = os.path.dirname(os.path.abspath(__file__))
-script_dir = os.path.dirname(script_dir)
-
-dotenv.load_dotenv(os.path.join(script_dir + "/.env"))
-
-
-ZUKI_API_KEY = os.getenv("ZUKI_API_KEY")
-NAGA_API_KEY = os.getenv("NAGA_API_KEY")
-HYZENBERG_API_KEY = os.getenv("HYZENBERG_API_KEY")
-KRAKEN_API_KEY = os.getenv("KRAKEN_API_KEY")
-WEBRAFT_API_KEY = os.getenv("WEBRAFT_API_KEY")
-SHUTTLE_API_KEY = os.getenv("SHUTTLE_API_KEY")
-OXYGEN_API_KEY = os.getenv("OXYGEN_API_KEY")
-MANDRILL_API_KEY = os.getenv("MANDRILL_API_KEY")
-
-
-def get_prompt(data, prompt=None):
-    prompt = (
-        prompt
-        if prompt
-        else """Instructions:
+def get_prompt(data):
+    default_prompt = """Instructions:
 1. Review the text carefully.
 2. Identify key concepts, important definitions, and significant facts.
 3. For each key point, generate a question that prompts recall or understanding.
@@ -34,118 +19,72 @@ def get_prompt(data, prompt=None):
 6. Format the flashcards into JSON, with each flashcard containing a question and its corresponding answer.
 7. Ensure that the JSON structure follows the format: [{"question": "Question text", "answer": "Answer text"}, ...]
 8. Aim for clarity and simplicity in both questions and answers."""
+    return f"{data}\n{default_prompt}"
+
+
+def extract_list(data):
+    extracted = []
+    if isinstance(data, dict):
+        for key, value in data.items():
+            extracted.extend(extract_list(value))
+    elif isinstance(data, list):
+        for item in data:
+            extracted.extend(extract_list(item))
+    elif isinstance(data, dict) and "question" in data and "answer" in data:
+        extracted.append(data)
+    return extracted
+
+
+def post(url, data):
+    try:
+        response = requests.post(url, json=data)
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException as e:
+        print(f"Error during API request: {e}")
+        return None
+
+
+def get_flashcards_data(data, model="llama3"):
+    response = post(
+        API_URL,
+        {
+            "model": model,
+            "prompt": get_prompt(data),
+            "stream": False,
+            "format": "json",
+        },
     )
-    return f"""
-{data}
-{prompt}
-"""
-
-
-def extract_list(response):
-    if isinstance(response, list):
-        if isinstance(response[0], dict):
-            if "question" in response[0].keys() and "answer" in response[0].keys():
-                return response
-        return []
-    elif isinstance(response, dict):
-        ss = []
-        if "question" in response.keys() and "answer" in response.keys():
-            ss.append(response)
-        for k, v in response.items():
-            if isinstance(v, list):
-                if isinstance(v[0], dict):
-                    if "question" in v[0].keys() and "answer" in v[0].keys():
-                        ss.extend(v)
-            elif isinstance(v, dict):
-                return extract_list(v)
-
-        return ss
-
+    if response and "response" in response:
+        return response["response"]
     else:
-        return []
+        print("Invalid response from API.")
+        return None
 
 
-def configure_zuki():
-    return OpenAI(
-        api_key=NAGA_API_KEY,
-        base_url="https://zukijourney.xyzbot.net/v1",
-    )
+def generate(debug=False, model=None):
+    """
+    Generate flashcards from input files.
 
+    Args:
+        debug (bool, optional): If True, raise an exception when an error occurs. Defaults to False.
+        model: The model to use for generating flashcards. Defaults to None.
 
-def configure_naga():
-    return OpenAI(
-        base_url="https://api.naga.ac/v1", api_key="ng-qw70virPCYuGF4lH310opCp6JrwV9"
-    )
+    Returns:
+        list: A list of file paths where the generated flashcards are saved.
+    """
+    
+    output_path = os.path.join(PROJECT_ROOT, "extracted_json")
+    input_path = os.path.join(PROJECT_ROOT, "extracted_data")
+    if not os.path.exists(input_path):
+        raise FileNotFoundError("Extracted data directory not found.")
 
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
 
-def configure_hyzenberg():
-    return OpenAI(
-        base_url="https://api.hyzen.cc/v1",
-        api_key=HYZENBERG_API_KEY,
-    )
+    cache_db_path = os.path.join(PROJECT_ROOT, "cache.db")
+    caching.init_cache_db(cache_db_path)
 
-
-def configure_kraken():
-    return OpenAI(
-        base_url="https://api.cracked.systems/v1",
-        api_key=KRAKEN_API_KEY,
-    )
-
-
-def configure_webraft():
-    return OpenAI(
-        base_url="https://api.webraft.in/freeapi",
-        api_key=WEBRAFT_API_KEY,
-    )
-
-
-def configure_shuttle():
-    return OpenAI(
-        base_url="https://api.shuttleai.app/v1",
-        api_key=SHUTTLE_API_KEY,
-    )
-
-
-def configure_mandrill():
-    return OpenAI(
-        base_url="https://api.mandrillai.tech/v1",
-        api_key=MANDRILL_API_KEY,
-    )
-
-
-def configure_oxygen():
-    return OpenAI(
-        base_url="https://app.oxyapi.uk/v1/",
-        api_key=OXYGEN_API_KEY,
-    )
-
-
-CLIENTS = [
-    configure_naga(),
-    configure_zuki(),
-    configure_hyzenberg(),
-    configure_kraken(),
-    configure_webraft(),
-    configure_shuttle(),
-    configure_mandrill(),
-    configure_oxygen(),
-]
-
-
-def use_ai(client, content):
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo", messages=[{"role": "user", "content": content}]
-    )
-    return response.choices[0].message.content
-
-
-def get_flashcards_data(data, client, prompt=None):
-    content = get_prompt(data, prompt)
-
-    return use_ai(client, content)
-
-
-def generate(input_path, output_path, prompt=None):
     input_files = []
     if os.path.isfile(input_path):
         input_files.append(input_path)
@@ -159,55 +98,34 @@ def generate(input_path, output_path, prompt=None):
         )
     else:
         print("Invalid input path.")
-        exit()
-
-    if not os.path.exists(output_path):
-        os.makedirs(output_path)
+        return
 
     try:
-        print("Getting flashcards data...")
-        for file in tqdm(input_files):
-            output_file = os.path.join(
-                output_path, os.path.splitext(os.path.basename(file))[0] + ".json"
-            )
-            if os.path.exists(output_file):
-                continue
+        files = []
+        for file in tqdm(input_files, desc="Processing files"):
             with open(file, "r", encoding="utf-8") as f:
                 data = f.read()
-            while len(CLIENTS) > 0:
-                client = CLIENTS[0]
-                print(f"Using client: {client.base_url}")
-                try:
-                    flashcards_data = get_flashcards_data(data, client, prompt=prompt)
-                    if flashcards_data is not None:
-                        flashcards_data = json.loads(flashcards_data)
-                        flashcards_data = extract_list(flashcards_data)
-                        with open(output_file, "w", encoding="utf-8") as f:
-                            json.dump(flashcards_data, f, indent=4)
-                        break  # Stop trying other clients if successful
-                except Exception as e:
-                    CLIENTS.pop(0)  # Remove failed client
-                    print(e)
-                    print(f"\nError with client: {client.base_url}")
-                    continue  # Try next client if error occurs
+            file_hash = caching.generate_sha256(data)
+            output_file = os.path.join(output_path, file_hash + ".json")
+            file_path = caching.get_file_path_from_cache(cache_db_path, file_hash)
+            files.append(output_file)
+            if file_path:
+                caching.update_file_path_in_cache(cache_db_path, file_hash, output_file)
             else:
-                print("All AI services failed. Please try again later.")
-                exit()
-        print("All flashcards data saved successfully.")
+                flashcards_data = get_flashcards_data(data, model)
+                if flashcards_data:
+                    flashcards_data = json.loads(flashcards_data)
+                    with open(output_file, "w", encoding="utf-8") as f:
+                        json.dump(flashcards_data, f, indent=4)
+                        caching.add_file_path_to_cache(
+                            cache_db_path, file_hash, output_file
+                        )
+                else:
+                    print(f"Failed to generate flashcards for {file}")
+        print(f"Flashcards generated for {len(files)} files.")
+        return files
     except Exception as e:
-        import traceback
+        print(f"An error occurred: {e}")
+        if debug:
+            raise e
 
-        traceback.print_exc()
-        print("An error occurred. Please check the logs for more information.")
-        exit()
-
-
-def generate_flashcards(prompt=None):
-    if not os.path.exists("./extracted_data"):
-        raise FileNotFoundError("Extracted data directory not found.")
-
-    generate("./extracted_data", "./flashcard_data", prompt=prompt)
-
-
-def generate_flashcards_from_args(args):
-    generate(args.input, args.output, prompt=args.prompt)

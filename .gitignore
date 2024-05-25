@@ -2,3 +2,7 @@ venv/
 testing.ipynb
 *.pyc
 .env
+extracted_data/
+extracted_json/
+cache.db
+output/flashcards.pptx
