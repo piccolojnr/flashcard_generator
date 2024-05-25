@@ -42,6 +42,9 @@ The Flashcard Generator is a unified tool designed to extract text from various 
    ```sh
    pip install -r requirements.txt
    ```
+4. Install [Ollama](https://ollama.com/) and ensure you have a working model pulled:
+
+   Follow the instructions on the [Ollama website](https://ollama.com/docs/installation) to install Ollama and pull the required model.
 
 ## Usage
 
