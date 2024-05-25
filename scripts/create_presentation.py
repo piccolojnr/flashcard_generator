@@ -45,27 +45,17 @@ def add_flashcard(question, answer, output_slide, slide_layout, conf):
 
         # add text
         if name == "at":
-            if isinstance(answer, str):
-                new_paragraph.text = answer
-                new_paragraph.font.color.rgb = RGBColor(
-                    text_shape["color"][0],
-                    text_shape["color"][1],
-                    text_shape["color"][2],
-                )
-                if len(answer) > 217:
-                    new_paragraph.font.size = Pt(33)
-            else:
-                options = answer["options"]
-                correct_answer = answer["correct_answer"]
-                new_paragraph.text = ", ".join(options).capitalize()
-                new_paragraph.font.color.rgb = RGBColor(255, 0, 0)
-
-                new_paragraph2 = new_text_frame.add_paragraph()
-                new_paragraph2.text = f"Correct answer: {correct_answer}"
-                new_paragraph2.font.color.rgb = RGBColor(0, 255, 0)
-                new_paragraph2.alignment = text_shape["alignment"]
-                if len("".join(options)) + len(correct_answer) > 217:
-                    new_paragraph.font.size = Pt(33)
+            if isinstance(answer, list):
+                answer = "\n".join(answer)
+            new_paragraph.text = answer
+            new_paragraph.font.color.rgb = RGBColor(
+                text_shape["color"][0],
+                text_shape["color"][1],
+                text_shape["color"][2],
+            )
+            if len(answer) > 217:
+                new_paragraph.font.size = Pt(33)
+          
 
         elif name == "qt":
             new_paragraph.text = question
